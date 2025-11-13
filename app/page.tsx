@@ -64,7 +64,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t mt-20 py-6 bg-white">
         <div className="max-w-6xl mx-auto px-4 text-center text-gray-600 text-sm">
-          <p>© 2024 App Helper Pramita Manado. All rights reserved.</p>
+          <p>© 2025 <span className='text-rose-500 text-bold'>Wahyu lamani</span>. All rights reserved.</p>
         </div>
       </footer>
     </div>
