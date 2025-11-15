@@ -370,34 +370,32 @@ export default function MergeAsPDF() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Merge Documents</h1>
-          <p className="text-gray-600">
-            Drag and Drop your Document below ! 
-          </p>
-        </div>
-
-        <FileUploader onFilesChange={setUploadedFiles} />
-
-        {/* Debug Info */}
-        {uploadedFiles.length > 0 && (
-          <div className="mt-8 max-w-4xl mx-auto p-4 bg-gray-100 rounded-lg">
-            <p className="text-sm font-semibold text-gray-700 mb-2">Debug - File Settings:</p>
-            <div className="text-xs text-gray-600 space-y-1">
-              {uploadedFiles.map((file, i) => (
-                <div key={file.id} className="flex gap-2">
-                  <span className="font-medium">#{i + 1}</span>
-                  <span className="flex-1 truncate">{file.name}</span>
-                  <span className="text-purple-600">{file.rotation}°</span>
-                  {/* <span className="text-blue-600">{file.orientation}</span> */}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+    <div className="max-w-6xl mx-auto px-4">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2">Merge Documents</h1>
+        <p className="text-gray-600">
+          Drag and Drop your Document below ! 
+        </p>
       </div>
+
+      <FileUploader onFilesChange={setUploadedFiles} />
+
+      {/* Debug Info */}
+      {uploadedFiles.length > 0 && (
+        <div className="mt-8 max-w-4xl mx-auto p-4 bg-gray-100 rounded-lg">
+          <p className="text-sm font-semibold text-gray-700 mb-2">Debug - File Settings:</p>
+          <div className="text-xs text-gray-600 space-y-1">
+            {uploadedFiles.map((file, i) => (
+              <div key={file.id} className="flex gap-2">
+                <span className="font-medium">#{i + 1}</span>
+                <span className="flex-1 truncate">{file.name}</span>
+                <span className="text-purple-600">{file.rotation}°</span>
+                {/* <span className="text-blue-600">{file.orientation}</span> */}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
