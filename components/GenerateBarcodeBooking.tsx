@@ -65,6 +65,10 @@ export default function GenerateBarcodeBooking(){
             alert("Printer belum terhubung");
           }
       }
+      const reload = () => {
+        setStrkeu([])
+        setPrintIndex(0)
+      }
       
     return(
         <div className="max-w-6xl mx-auto px-4">
@@ -76,7 +80,7 @@ export default function GenerateBarcodeBooking(){
             </div>
             <div className="">
                 <div className="flex justify-end">
-                    <button className="px-2 py-3 text-white bg-rose-600 rounded-lg flex items-center justify-center mb-4" onClick={ () => setStrkeu([]) }><RefreshCw className="w-6 h-6 mr-2"/>Reload</button>
+                    <button className="px-2 py-3 text-white bg-rose-600 rounded-lg flex items-center justify-center mb-4" onClick={ () => reload() }><RefreshCw className="w-6 h-6 mr-2"/>Reload</button>
                 </div>
                 {strkeu.length == 0 && (
                     <div className="mb-6">
