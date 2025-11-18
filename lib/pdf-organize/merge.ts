@@ -1,6 +1,5 @@
 import { PDFDocument, degrees, rgb } from 'pdf-lib';
 import type { PDFPage } from '@/types/pdforg';
-import { convertImageToPngOrJpeg } from '@/lib/pdf-organize/imageConverter';
 
 export interface MergeOptions {
   addPageNumbers?: boolean;
@@ -21,7 +20,7 @@ export async function mergePDFPages(
 
     const arrayBuffer = await file.arrayBuffer();
 
-    // ✅ Handle PDF files
+    // Handle PDF files
     if (file.type === 'application/pdf') {
       const sourcePdf = await PDFDocument.load(arrayBuffer);
       const [copiedPage] = await mergedPdf.copyPages(sourcePdf, [pageNumber - 1]);
@@ -44,59 +43,61 @@ export async function mergePDFPages(
         });
       }
     } 
-    // ✅ Handle Image files
+    // ✅ Handle Image files - SIMPLIFIED
     else if (file.type.startsWith('image/')) {
-      const page = mergedPdf.addPage();
       let image;
-    
+
       try {
-        let imageData = arrayBuffer;
-        let imageType = file.type;
-    
-        // ✅ Convert unsupported formats (GIF, WEBP, etc) to PNG
-        if (!file.type.match(/image\/(png|jpeg|jpg)/)) {
-          console.log(`Converting ${file.type} to PNG...`);
-          const converted = await convertImageToPngOrJpeg(file);
-          imageData = converted.data;
-          imageType = `image/${converted.type}`;
-        }
-    
-        // Embed image
-        if (imageType === 'image/png') {
-          image = await mergedPdf.embedPng(imageData);
-        } else if (imageType === 'image/jpeg' || imageType === 'image/jpg') {
-          image = await mergedPdf.embedJpg(imageData);
+        // Embed image based on type
+        if (file.type === 'image/png') {
+          image = await mergedPdf.embedPng(arrayBuffer);
+        } else if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+          image = await mergedPdf.embedJpg(arrayBuffer);
         } else {
-          throw new Error(`Unsupported image type: ${imageType}`);
+          // For unsupported formats, try to convert
+          const converted = await convertImageToPng(file);
+          image = await mergedPdf.embedPng(converted);
         }
-    
-        const { width, height } = page.getSize();
+
+        // Create page with image dimensions (or standard A4)
+        const imgWidth = image.width;
+        const imgHeight = image.height;
         
-        // Scale image to fit page
-        const scale = Math.min(
-          (width * 0.9) / image.width,
-          (height * 0.9) / image.height
-        );
-    
-        const imgWidth = image.width * scale;
-        const imgHeight = image.height * scale;
-    
-        // Center and draw
-        const x = (width - imgWidth) / 2;
-        const y = (height - imgHeight) / 2;
-    
+        // Use image aspect ratio for page size
+        const maxWidth = 595; // A4 width in points
+        const maxHeight = 842; // A4 height in points
+        
+        let pageWidth, pageHeight;
+        
+        if (imgWidth / imgHeight > maxWidth / maxHeight) {
+          // Image is wider, fit to width
+          pageWidth = maxWidth;
+          pageHeight = (maxWidth * imgHeight) / imgWidth;
+        } else {
+          // Image is taller, fit to height
+          pageHeight = maxHeight;
+          pageWidth = (maxHeight * imgWidth) / imgHeight;
+        }
+
+        const page = mergedPdf.addPage([pageWidth, pageHeight]);
+
+        // Draw image to fill the page (no rotation here)
         page.drawImage(image, {
-          x: x,
-          y: y,
-          width: imgWidth,
-          height: imgHeight,
-          rotate: degrees(rotation),
+          x: 0,
+          y: 0,
+          width: pageWidth,
+          height: pageHeight,
         });
-    
+
+        // ✅ Apply rotation to the PAGE itself (bukan image)
+        if (rotation !== 0) {
+          page.setRotation(degrees(rotation));
+        }
+
         // Optional: Add page numbers
         if (addPageNumbers) {
           page.drawText(`${i + 1}`, {
-            x: width / 2 - 10,
+            x: pageWidth / 2 - 10,
             y: 20,
             size: 12,
             color: rgb(0.5, 0.5, 0.5),
@@ -104,13 +105,52 @@ export async function mergePDFPages(
         }
       } catch (error) {
         console.error(`Error embedding image ${file.name}:`, error);
-        mergedPdf.removePage(mergedPdf.getPageCount() - 1);
-        alert(`Gagal memproses gambar: ${file.name}. File akan dilewati.`);
       }
     }
   }
 
   return await mergedPdf.save();
+}
+
+// Helper function to convert unsupported images to PNG
+async function convertImageToPng(file: File): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      img.src = e.target?.result as string;
+    };
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Cannot get canvas context'));
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0);
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          reject(new Error('Failed to convert image'));
+          return;
+        }
+
+        const arrayBuffer = await blob.arrayBuffer();
+        resolve(arrayBuffer);
+      }, 'image/png');
+    };
+
+    img.onerror = () => reject(new Error('Failed to load image'));
+    reader.onerror = () => reject(new Error('Failed to read file'));
+
+    reader.readAsDataURL(file);
+  });
 }
 
 export async function mergeMultipleFiles(
@@ -137,7 +177,6 @@ export async function mergeMultipleFiles(
     }
     // Handle image files
     else if (file.type.startsWith('image/')) {
-      const page = mergedPdf.addPage();
       let image;
 
       try {
@@ -146,30 +185,41 @@ export async function mergeMultipleFiles(
         } else if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
           image = await mergedPdf.embedJpg(arrayBuffer);
         } else {
-          console.warn(`Unsupported image type: ${file.type}`);
-          mergedPdf.removePage(mergedPdf.getPageCount() - 1);
-          continue;
+          const converted = await convertImageToPng(file);
+          image = await mergedPdf.embedPng(converted);
         }
 
-        const { width, height } = page.getSize();
-        const scale = Math.min(
-          (width * 0.9) / image.width,
-          (height * 0.9) / image.height
-        );
+        const imgWidth = image.width;
+        const imgHeight = image.height;
+        
+        const maxWidth = 595;
+        const maxHeight = 842;
+        
+        let pageWidth, pageHeight;
+        
+        if (imgWidth / imgHeight > maxWidth / maxHeight) {
+          pageWidth = maxWidth;
+          pageHeight = (maxWidth * imgHeight) / imgWidth;
+        } else {
+          pageHeight = maxHeight;
+          pageWidth = (maxHeight * imgWidth) / imgHeight;
+        }
 
-        const imgWidth = image.width * scale;
-        const imgHeight = image.height * scale;
+        const page = mergedPdf.addPage([pageWidth, pageHeight]);
 
         page.drawImage(image, {
-          x: (width - imgWidth) / 2,
-          y: (height - imgHeight) / 2,
-          width: imgWidth,
-          height: imgHeight,
-          rotate: degrees(rotation),
+          x: 0,
+          y: 0,
+          width: pageWidth,
+          height: pageHeight,
         });
+
+        // ✅ Rotate page, not image
+        if (rotation !== 0) {
+          page.setRotation(degrees(rotation));
+        }
       } catch (error) {
         console.error(`Error processing image ${file.name}:`, error);
-        mergedPdf.removePage(mergedPdf.getPageCount() - 1);
       }
     }
   }
