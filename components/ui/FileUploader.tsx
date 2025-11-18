@@ -2,11 +2,12 @@
 
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import type { UploadedFile } from '@/types/pdforg';
+import type { UploadedFile, PDFPage } from '@/types/pdforg';
 import { generatePDFThumbnail, getPDFPageCount } from '@/lib/pdf-organize/thumbnail';
+import { extractPDFPages } from '@/lib/pdf-organize/pages';
 
 interface FileUploaderProps {
-  onFilesSelected: (files: UploadedFile[]) => void;
+  onFilesSelected: (files: UploadedFile[], pages: PDFPage[]) => void; // ✅ Tambah pages
   accept?: string;
   maxFiles?: number;
 }
@@ -17,37 +18,86 @@ export default function FileUploader({
   maxFiles = 10 
 }: FileUploaderProps) {
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState('');
 
   const processFiles = async (acceptedFiles: File[]) => {
     setIsProcessing(true);
     const processedFiles: UploadedFile[] = [];
+    const allPages: PDFPage[] = [];
 
-    for (const file of acceptedFiles) {
+    for (let fileIndex = 0; fileIndex < acceptedFiles.length; fileIndex++) {
+      const file = acceptedFiles[fileIndex];
       const isPdf = file.type === 'application/pdf';
       const isImage = file.type.startsWith('image/');
+
+      setProcessingStatus(`Memproses file ${fileIndex + 1}/${acceptedFiles.length}: ${file.name}`);
 
       let thumbnail = '';
       let pageCount = undefined;
 
       if (isPdf) {
+        // Generate thumbnail untuk file card
         thumbnail = await generatePDFThumbnail(file);
         pageCount = await getPDFPageCount(file);
+
+        // ✅ Auto extract semua halaman
+        const extractedPages = await extractPDFPages(file);
+        
+        const fileId = `${Date.now()}-${Math.random()}`;
+        
+        // Convert ke PDFPage format
+        const pdfPages: PDFPage[] = extractedPages.map((p) => ({
+          id: `${fileId}-page-${p.pageNumber}`,
+          fileId: fileId,
+          file: file,
+          fileName: file.name,
+          pageNumber: p.pageNumber,
+          thumbnail: p.thumbnail,
+          rotation: 0,
+        }));
+
+        allPages.push(...pdfPages);
+
+        processedFiles.push({
+          id: fileId,
+          file,
+          name: file.name,
+          size: file.size,
+          type: 'pdf',
+          thumbnail,
+          pageCount,
+        });
+
       } else if (isImage) {
         thumbnail = await createImagePreview(file);
-      }
+        
+        const fileId = `${Date.now()}-${Math.random()}`;
 
-      processedFiles.push({
-        id: `${Date.now()}-${Math.random()}`,
-        file,
-        name: file.name,
-        size: file.size,
-        type: isPdf ? 'pdf' : 'image',
-        thumbnail,
-        pageCount,
-      });
+        // ✅ Tambahkan gambar sebagai "page"
+        allPages.push({
+          id: `${fileId}-page-1`,
+          fileId: fileId,
+          file: file,
+          fileName: file.name,
+          pageNumber: 1,
+          thumbnail: thumbnail,
+          rotation: 0,
+        });
+
+        processedFiles.push({
+          id: fileId,
+          file,
+          name: file.name,
+          size: file.size,
+          type: 'image',
+          thumbnail,
+          pageCount: 1,
+        });
+      }
     }
 
-    onFilesSelected(processedFiles);
+    setProcessingStatus('');
+    onFilesSelected(processedFiles, allPages);
     setIsProcessing(false);
   };
 
@@ -91,9 +141,16 @@ export default function FileUploader({
         {isProcessing ? (
           <>
             <div className="mx-auto h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-lg font-medium text-gray-700">
-              Memproses file...
-            </p>
+            <div>
+              <p className="text-lg font-medium text-gray-700">
+                Memproses file...
+              </p>
+              {processingStatus && (
+                <p className="text-sm text-gray-500 mt-2">
+                  {processingStatus}
+                </p>
+              )}
+            </div>
           </>
         ) : (
           <>

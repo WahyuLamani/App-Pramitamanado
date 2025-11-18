@@ -1,15 +1,14 @@
 'use client';
 
-import type { UploadedFile, PDFPage } from '@/types/pdforg';
+import type { UploadedFile } from '@/types/pdforg';
 import FileCard from './FileCard';
 
 interface FileListProps {
   files: UploadedFile[];
   onRemove: (id: string) => void;
-  onPagesExtracted?: (fileId: string, pages: PDFPage[]) => void;
 }
 
-export default function FileList({ files, onRemove, onPagesExtracted }: FileListProps) {
+export default function FileList({ files, onRemove }: FileListProps) {
   return (
     <div className="mt-8">
       <h2 className="text-xl font-semibold mb-4">
@@ -21,7 +20,6 @@ export default function FileList({ files, onRemove, onPagesExtracted }: FileList
             key={file.id}
             file={file}
             onRemove={onRemove}
-            onPagesExtracted={onPagesExtracted}
           />
         ))}
       </div>

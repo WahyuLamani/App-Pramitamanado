@@ -1,31 +1,36 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import FileUploader from '@/components/ui/FileUploader';
 import FileList from '@/components/ui/FileList';
-import AllPagesView from '@/components/features/AllPagesView';
+import AllPagesView from './AllPagesView';
 import type { UploadedFile, PDFPage } from '@/types/pdforg';
 
 export default function PDFUploadSection() {
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [allPages, setAllPages] = useState<PDFPage[]>([]);
+  const allPagesRef = useRef<HTMLDivElement>(null);
 
-  const handleFilesSelected = (selectedFiles: UploadedFile[]) => {
+  // ✅ Auto scroll ke "Semua Halaman" saat ada pages baru
+  useEffect(() => {
+    if (allPages.length > 0 && allPagesRef.current) {
+      setTimeout(() => {
+        allPagesRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }, 300);
+    }
+  }, [allPages.length]);
+
+  const handleFilesSelected = (selectedFiles: UploadedFile[], pages: PDFPage[]) => {
     setFiles(prev => [...prev, ...selectedFiles]);
+    setAllPages(prev => [...prev, ...pages]); // ✅ Langsung tambahkan pages
   };
 
   const removeFile = (id: string) => {
     setFiles(prev => prev.filter(f => f.id !== id));
     setAllPages(prev => prev.filter(p => p.fileId !== id));
-  };
-
-  const handlePagesExtracted = (fileId: string, pages: PDFPage[]) => {
-    setAllPages(prev => {
-      // Remove old pages dari file ini
-      const filtered = prev.filter(p => p.fileId !== fileId);
-      // Add pages baru
-      return [...filtered, ...pages];
-    });
   };
 
   const handlePagesChange = (updatedPages: PDFPage[]) => {
@@ -41,17 +46,19 @@ export default function PDFUploadSection() {
           <FileList 
             files={files} 
             onRemove={removeFile}
-            onPagesExtracted={handlePagesExtracted}
           />
         )}
       </div>
 
-      {allPages.length > 0 && (
-        <AllPagesView 
-          pages={allPages}
-          onPagesChange={handlePagesChange}
-        />
-      )}
+      {/* ✅ Tambahkan ref untuk auto scroll */}
+      <div ref={allPagesRef}>
+        {allPages.length > 0 && (
+          <AllPagesView 
+            pages={allPages}
+            onPagesChange={handlePagesChange}
+          />
+        )}
+      </div>
     </div>
   );
 }
