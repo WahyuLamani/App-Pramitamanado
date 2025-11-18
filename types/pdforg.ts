@@ -12,6 +12,7 @@ export interface UploadedFile {
 export interface PDFPage {
   id: string;
   fileId: string; // Reference ke file asli
+  file: File; // untuk reference ke file asli
   fileName: string;
   pageNumber: number; // Halaman ke berapa (1-based)
   thumbnail: string;

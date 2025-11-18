@@ -41,6 +41,7 @@ export default function FileCard({ file, onRemove, onPagesExtracted }: FileCardP
         const pdfPages: PDFPage[] = extractedPages.map((p) => ({
           id: `${file.id}-page-${p.pageNumber}`,
           fileId: file.id,
+          file: file.file, // ✅ Tambahkan reference ke file asli
           fileName: file.name,
           pageNumber: p.pageNumber,
           thumbnail: p.thumbnail,

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FileUploader from '@/components/ui/FileUploader';
 import FileList from '@/components/ui/FileList';
+import AllPagesView from '@/components/features/AllPagesView';
 import type { UploadedFile, PDFPage } from '@/types/pdforg';
 
 export default function PDFUploadSection() {
@@ -27,24 +28,29 @@ export default function PDFUploadSection() {
     });
   };
 
-  return (
-    <div className="bg-white rounded-xl shadow-lg p-8">
-      <FileUploader onFilesSelected={handleFilesSelected} />
+  const handlePagesChange = (updatedPages: PDFPage[]) => {
+    setAllPages(updatedPages);
+  };
 
-      {files.length > 0 && (
-        <FileList 
-          files={files} 
-          onRemove={removeFile}
-          onPagesExtracted={handlePagesExtracted}
-        />
-      )}
+  return (
+    <div className="space-y-8">
+      <div className="bg-white rounded-xl shadow-lg p-8">
+        <FileUploader onFilesSelected={handleFilesSelected} />
+
+        {files.length > 0 && (
+          <FileList 
+            files={files} 
+            onRemove={removeFile}
+            onPagesExtracted={handlePagesExtracted}
+          />
+        )}
+      </div>
 
       {allPages.length > 0 && (
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-800">
-            💡 Total {allPages.length} halaman siap untuk diproses
-          </p>
-        </div>
+        <AllPagesView 
+          pages={allPages}
+          onPagesChange={handlePagesChange}
+        />
       )}
     </div>
   );
