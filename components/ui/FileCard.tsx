@@ -126,7 +126,8 @@ export default function FileCard({ file, onRemove, onPagesExtracted }: FileCardP
 
         {/* Action Buttons */}
         <div className="absolute top-2 right-2 flex gap-1">
-          {file.type === 'pdf' && file.pageCount && file.pageCount > 1 && (
+          {/* ✅ FIX: Hapus kondisi pageCount > 1, semua PDF bisa di-expand */}
+          {file.type === 'pdf' && file.pageCount && (
             <button
               onClick={handleExpand}
               disabled={isLoading}
