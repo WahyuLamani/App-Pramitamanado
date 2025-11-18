@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Barcode, Merge, MonitorCog,  } from 'lucide-react';
+import { Barcode, Merge, MonitorCog, UnfoldHorizontal,  } from 'lucide-react';
 
 export default function HomePage() {
   const apps = [
@@ -8,6 +8,13 @@ export default function HomePage() {
       description: 'Combine multiple PDF and image files into one document',
       href: '/merge',
       icon: Merge,
+      color: 'from-red-600 to-rose-600'
+    },
+    {
+      name: 'Organize PDF',
+      description: 'Upload PDF, rearrange pages, delete or rotate pages',
+      href: '/organize-pdf',
+      icon: UnfoldHorizontal,
       color: 'from-red-600 to-rose-600'
     },
     {
