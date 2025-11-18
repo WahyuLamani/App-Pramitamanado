@@ -1,6 +1,9 @@
 import { pdfjsLib } from './pdf-config';
 
-export async function extractPDFPages(file: File): Promise<{
+export async function extractPDFPages(
+  file: File,
+  onProgress?: (current: number, total: number) => void
+): Promise<{
   pageNumber: number;
   thumbnail: string;
 }[]> {
@@ -12,8 +15,13 @@ export async function extractPDFPages(file: File): Promise<{
     const pages = [];
     const numPages = pdf.numPages;
 
-    // Extract semua halaman
+    // Extract semua halaman dengan progress tracking
     for (let i = 1; i <= numPages; i++) {
+      // Update progress
+      if (onProgress) {
+        onProgress(i, numPages);
+      }
+
       const page = await pdf.getPage(i);
       const thumbnail = await generatePageThumbnail(page);
       
@@ -32,7 +40,7 @@ export async function extractPDFPages(file: File): Promise<{
 }
 
 async function generatePageThumbnail(page: any): Promise<string> {
-  const scale = 0.5;
+  const scale = 0.5; // Bisa disesuaikan untuk kualitas thumbnail
   const viewport = page.getViewport({ scale });
   
   const canvas = document.createElement('canvas');
