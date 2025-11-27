@@ -32,14 +32,14 @@ export default function GenerateBarcodeBooking(){
       };
 
 
-      const generateZPL = (kdbooking: string, nama : string) => {
+      const generateZPL = (nama : string, kdbooking: string) => {
         return `
             ^XA
             ^PW460
             ^LL240
             ^FO20,40^A0N,30,30^FD${nama}^FS
             ^FO20,80^BY2
-            ^BCN,100,Y,N,N
+            ^BCN,110,Y,N,N
             ^FD${kdbooking}^FS
             ^XZ
             `;
