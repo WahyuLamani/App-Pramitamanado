@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Model untuk User/Petugas
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String   // Dalam production, gunakan bcrypt
+  name      String
+  createdAt DateTime @default(now())
+  
+  bookings  Booking[]
+}
+
+// Model untuk Booking
+model Booking {
+  id            Int      @id @default(autoincrement())
+  patientName   String
+  patientPhone  String
+  examination   String   // "USG Perut", "USG Jantung", "Treadmill"
+  bookingDate   DateTime
+  timeSlot      String   // Format: "10:00-10:20"
+  status        String   @default("Belum Registrasi") // "Belum Registrasi", "Sudah Registrasi", atau custom
+  notes         String?  // Keterangan tambahan
+  
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([bookingDate, timeSlot])
+  @@index([userId])
+}
