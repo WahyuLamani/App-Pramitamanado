@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Barcode, Merge, MonitorCog, UnfoldHorizontal,  } from 'lucide-react';
+import { Barcode, BookOpenText, Merge, MonitorCog, UnfoldHorizontal,  } from 'lucide-react';
 
 export default function HomePage() {
   const apps = [
@@ -19,9 +19,16 @@ export default function HomePage() {
     },
     {
       name: 'Barcode Booking For BPJS',
-      description: 'generate barcode booking for BJPS sample using data from KEU30',
+      description: 'Generate barcode booking for BJPS sample using data from KEU30',
       href: '/barcode-booking',
       icon: Barcode,
+      color: 'from-red-600 to-rose-600'
+    },
+    {
+      name: 'Logbook Medical Examinaton',
+      description: 'Health Checkup Book is a simple system for booking health checkup appointments.',
+      href: '/booking-examination',
+      icon: BookOpenText,
       color: 'from-red-600 to-rose-600'
     },
     // Tambahkan app helper lainnya di sini nanti

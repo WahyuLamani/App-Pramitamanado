@@ -1,9 +1,28 @@
+// lib/actions/booking.ts
 'use server'
 
 import { prisma, handlePrismaError } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
+import { Booking, User } from '@prisma/client'
 
 // Type definitions
+export type BookingWithUser = Booking & {
+  user: {
+    id: number
+    name: string
+    username: string
+  }
+}
+
+export type ActionResponse<T = any> = {
+  success: boolean
+  data?: T
+  error?: string
+  details?: any
+  message?: string
+  count?: number
+}
+
 export type BookingInput = {
   patients: string | Array<{ name: string; phone: string }>
   examination: string
@@ -24,7 +43,7 @@ export type BookingUpdateInput = {
 }
 
 // GET - Ambil semua bookings
-export async function getBookings(date?: string) {
+export async function getBookings(date?: string): Promise<ActionResponse<BookingWithUser[]>> {
   try {
     const where = date
       ? {
@@ -57,13 +76,14 @@ export async function getBookings(date?: string) {
     const errorResponse = handlePrismaError(error)
     return {
       success: false,
-      ...errorResponse,
+      error: errorResponse.error,
+      details: errorResponse.details,
     }
   }
 }
 
 // GET - Ambil booking by ID
-export async function getBookingById(id: number) {
+export async function getBookingById(id: number): Promise<ActionResponse<BookingWithUser>> {
   try {
     const booking = await prisma.booking.findUnique({
       where: { id },
@@ -93,13 +113,14 @@ export async function getBookingById(id: number) {
     const errorResponse = handlePrismaError(error)
     return {
       success: false,
-      ...errorResponse,
+      error: errorResponse.error,
+      details: errorResponse.details,
     }
   }
 }
 
 // CREATE - Buat booking baru (support multiple patients)
-export async function createBooking(input: BookingInput) {
+export async function createBooking(input: BookingInput): Promise<ActionResponse> {
   try {
     const { patients, examination, bookingDate, timeSlot, status, notes } = input
 
@@ -171,13 +192,14 @@ export async function createBooking(input: BookingInput) {
     const errorResponse = handlePrismaError(error)
     return {
       success: false,
-      ...errorResponse,
+      error: errorResponse.error,
+      details: errorResponse.details,
     }
   }
 }
 
 // UPDATE - Update booking (untuk reschedule atau update status)
-export async function updateBooking(id: number, input: BookingUpdateInput) {
+export async function updateBooking(id: number, input: BookingUpdateInput): Promise<ActionResponse<BookingWithUser>> {
   try {
     const { patientName, patientPhone, examination, bookingDate, timeSlot, status, notes } = input
 
@@ -231,13 +253,14 @@ export async function updateBooking(id: number, input: BookingUpdateInput) {
     const errorResponse = handlePrismaError(error)
     return {
       success: false,
-      ...errorResponse,
+      error: errorResponse.error,
+      details: errorResponse.details,
     }
   }
 }
 
 // DELETE - Hapus booking
-export async function deleteBooking(id: number) {
+export async function deleteBooking(id: number): Promise<ActionResponse> {
   try {
     await prisma.booking.delete({
       where: { id },
@@ -255,7 +278,8 @@ export async function deleteBooking(id: number) {
     const errorResponse = handlePrismaError(error)
     return {
       success: false,
-      ...errorResponse,
+      error: errorResponse.error,
+      details: errorResponse.details,
     }
   }
 }
