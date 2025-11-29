@@ -1,10 +1,15 @@
 // app/page.tsx
 import { getBookings } from '@/lib/booking-examination/action'
 import { formatDateDisplay } from '@/lib/booking-examination/utils/timeslot'
+import DateFilter from '@/components/features/DateFilter'
 
-export default async function DashboardPage() {
-  // Fetch data di server component
-  const result = await getBookings()
+type PageProps = {
+  searchParams: { date?: string }
+}
+
+export default async function DashboardPage({ searchParams }: PageProps) {
+  // Fetch data di server component dengan filter tanggal
+  const result = await getBookings(searchParams.date)
 
   if (!result.success) {
     return (
@@ -31,6 +36,9 @@ export default async function DashboardPage() {
             Kelola booking pemeriksaan USG dan Treadmill
           </p>
         </div>
+
+        {/* Date Filter */}
+        <DateFilter />
 
         {/* Stats Card */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
