@@ -5,6 +5,7 @@ import { formatDateDisplay } from '@/lib/booking-examination/utils/timeslot'
 import { BookingWithUser } from '@/lib/booking-examination/action'
 import Modal from '@/components/ui/Modal'
 import RescheduleForm from '@/components/RescheduleExamForm'
+import BookingRowEdit from '@/components/BookingExamRowEdit'
 
 type BookingTableProps = {
   bookings: BookingWithUser[]
@@ -14,6 +15,7 @@ export default function BookingTable({ bookings }: BookingTableProps) {
   const [isRescheduleMode, setIsRescheduleMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false)
+  const [editingId, setEditingId] = useState<number | null>(null)
 
   // Toggle select all
   const handleSelectAll = (checked: boolean) => {
@@ -53,6 +55,15 @@ export default function BookingTable({ bookings }: BookingTableProps) {
     setIsRescheduleModalOpen(false)
     setIsRescheduleMode(false)
     setSelectedIds([])
+  }
+
+  // Handle edit mode
+  const handleEditClick = (id: number) => {
+    setEditingId(id)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingId(null)
   }
 
   const selectedBookings = bookings.filter(b => selectedIds.includes(b.id))
@@ -140,6 +151,11 @@ export default function BookingTable({ bookings }: BookingTableProps) {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Keterangan
                   </th>
+                  {!isRescheduleMode && (
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Aksi
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -148,7 +164,7 @@ export default function BookingTable({ bookings }: BookingTableProps) {
                     key={booking.id} 
                     className={`hover:bg-gray-50 ${
                       selectedIds.includes(booking.id) ? 'bg-blue-50' : ''
-                    }`}
+                    } ${editingId === booking.id ? 'bg-yellow-50' : ''}`}
                   >
                     {isRescheduleMode && (
                       <td className="px-6 py-4">
@@ -160,46 +176,69 @@ export default function BookingTable({ bookings }: BookingTableProps) {
                         />
                       </td>
                     )}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {formatDateDisplay(booking.bookingDate)}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {booking.timeSlot}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {booking.patientName}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {booking.patientPhone}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {booking.examination}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          booking.status === 'Sudah Registrasi'
-                            ? 'bg-green-100 text-green-800'
-                            : booking.status === 'Belum Registrasi'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        {booking.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {booking.user.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
-                      {booking.notes || '-'}
-                    </td>
+                    
+                    {editingId === booking.id ? (
+                      <BookingRowEdit
+                        booking={booking}
+                        onCancel={handleCancelEdit}
+                      />
+                    ) : (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {formatDateDisplay(booking.bookingDate)}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {booking.timeSlot}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {booking.patientName}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {booking.patientPhone}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                            {booking.examination}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              booking.status === 'Sudah Registrasi'
+                                ? 'bg-green-100 text-green-800'
+                                : booking.status === 'Belum Registrasi'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {booking.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {booking.user.name}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          {booking.notes || '-'}
+                        </td>
+                        {!isRescheduleMode && (
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              onClick={() => handleEditClick(booking.id)}
+                              className="text-blue-600 hover:text-blue-800 transition-colors"
+                              title="Edit"
+                            >
+                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                          </td>
+                        )}
+                      </>
+                    )}
                   </tr>
                 ))}
               </tbody>
