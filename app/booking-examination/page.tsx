@@ -1,8 +1,9 @@
 import { getBookings } from '@/lib/booking-examination/action'
-import { formatDateDisplay } from '@/lib/booking-examination/utils/timeslot'
 import DateFilter from '@/components/features/DateFilter'
 
 import AddBookingButton from '@/components/ui/AddBookingButton'
+
+import BookingTable from '@/components/BookingExamTable'
 
 type PageProps = {
   searchParams: { date?: string }
@@ -66,95 +67,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         </div>
 
         {/* Booking List */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Daftar Booking
-            </h2>
-          </div>
-
-          {bookings.length === 0 ? (
-            <div className="px-6 py-12 text-center">
-              <p className="text-gray-500">Belum ada data booking</p>
-              <p className="text-sm text-gray-400 mt-1">
-                Klik tombol "Tambah Booking" untuk membuat booking baru
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tanggal & Jam
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Pasien
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Pemeriksaan
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Petugas
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Keterangan
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {bookings.map((booking) => (
-                    <tr key={booking.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {formatDateDisplay(booking.bookingDate)}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {booking.timeSlot}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {booking.patientName}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {booking.patientPhone}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                          {booking.examination}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            booking.status === 'Sudah Registrasi'
-                              ? 'bg-green-100 text-green-800'
-                              : booking.status === 'Belum Registrasi'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {booking.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {booking.user.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        {booking.notes || '-'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+        <BookingTable bookings={bookings} />
 
         {/* Action Button */}
         <div className="mt-6 flex justify-end">
