@@ -2,14 +2,14 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { formatDateForInput } from '@/lib/booking-examination/utils/timeslot'
+import { formatDateForInput, formatDateDisplay } from '@/lib/booking-examination/utils/timeslot'
 
 export default function DateFilter() {
   const router = useRouter()
   const searchParams = useSearchParams()
   
-  // Get current date from URL or default to today
-  const currentDate = searchParams.get('date') || formatDateForInput(new Date())
+  // Get current date from URL (no default to today)
+  const currentDate = searchParams.get('date') || ''
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value
@@ -71,9 +71,13 @@ export default function DateFilter() {
         </div>
       </div>
       
-      {currentDate && (
+      {currentDate ? (
         <div className="mt-3 text-sm text-gray-600">
-          Menampilkan booking untuk: <span className="font-semibold">{currentDate}</span>
+          Menampilkan booking untuk: <span className="font-semibold">{formatDateDisplay(currentDate)}</span>
+        </div>
+      ) : (
+        <div className="mt-3 text-sm text-gray-600">
+          Menampilkan booking untuk: <span className="font-semibold">Semua Tanggal</span>
         </div>
       )}
     </div>
