@@ -1,7 +1,8 @@
-// app/page.tsx
 import { getBookings } from '@/lib/booking-examination/action'
 import { formatDateDisplay } from '@/lib/booking-examination/utils/timeslot'
 import DateFilter from '@/components/features/DateFilter'
+
+import AddBookingButton from '@/components/ui/AddBookingButton'
 
 type PageProps = {
   searchParams: { date?: string }
@@ -155,14 +156,9 @@ export default async function DashboardPage({ searchParams }: PageProps) {
           )}
         </div>
 
-        {/* Action Button Placeholder */}
+        {/* Action Button */}
         <div className="mt-6 flex justify-end">
-          <button
-            disabled
-            className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold opacity-50 cursor-not-allowed"
-          >
-            Tambah Booking (Coming Soon)
-          </button>
+          <AddBookingButton />
         </div>
       </div>
     </div>
