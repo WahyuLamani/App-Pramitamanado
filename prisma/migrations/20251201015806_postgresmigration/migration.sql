@@ -1,26 +1,29 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Booking" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "patientName" TEXT NOT NULL,
     "patientPhone" TEXT NOT NULL,
     "examination" TEXT NOT NULL,
-    "bookingDate" DATETIME NOT NULL,
+    "bookingDate" TIMESTAMP(3) NOT NULL,
     "timeSlot" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'Belum Registrasi',
     "notes" TEXT,
     "userId" INTEGER NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL,
-    CONSTRAINT "Booking_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Booking_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -31,3 +34,6 @@ CREATE INDEX "Booking_bookingDate_timeSlot_idx" ON "Booking"("bookingDate", "tim
 
 -- CreateIndex
 CREATE INDEX "Booking_userId_idx" ON "Booking"("userId");
+
+-- AddForeignKey
+ALTER TABLE "Booking" ADD CONSTRAINT "Booking_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
