@@ -51,9 +51,12 @@ export type TimeSlot = {
    * Daftar jenis pemeriksaan
    */
   export const EXAMINATION_TYPES = [
-    { value: 'USG Perut', label: 'USG Perut' },
-    { value: 'USG Jantung', label: 'USG Jantung' },
+    { value: 'USG Upp & Low Abdomen', label: 'USG Upp & Low Abdomen' },
+    { value: 'Echocardiografi', label: 'Echocardiografi' },
+    { value: 'USG Testis', label: 'USG Testis' },
+    { value: 'HSG', label: 'HSG' },
     { value: 'Treadmill', label: 'Treadmill' },
+    { value: 'USG Lainnya', label: 'USG Lainnya' },
   ] as const
   
   /**

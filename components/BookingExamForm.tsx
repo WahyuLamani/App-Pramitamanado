@@ -16,7 +16,7 @@ export default function BookingForm({ onSuccess, onCancel }: BookingFormProps) {
   
   const [formData, setFormData] = useState({
     patients: '',
-    examination: 'USG Perut',
+    examination: 'USG Upp & Low Abdomen',
     bookingDate: formatDateForInput(new Date()),
     timeSlot: '',
     status: 'Belum Registrasi',
@@ -71,12 +71,12 @@ export default function BookingForm({ onSuccess, onCancel }: BookingFormProps) {
           name="patients"
           value={formData.patients}
           onChange={handleChange}
-          placeholder="Budi Santoso|081234567890 atau pisahkan dengan koma untuk multiple"
+          placeholder="Budi Santoso++081234567890 atau pisahkan dengan koma untuk multiple"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
           required
         />
         <p className="mt-1 text-xs text-gray-500">
-          Format: <code>Nama|NoHP</code> atau <code>Nama1|NoHP1,Nama2|NoHP2</code> untuk multiple
+          Format: <code>Nama++NoHP</code> atau <code>Nama1++NoHP1,Nama2++NoHP2</code> untuk multiple
         </p>
       </div>
 

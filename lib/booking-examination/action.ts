@@ -163,7 +163,7 @@ export async function createBooking(input: BookingInput): Promise<ActionResponse
       // Format: "Nama1|08123,Nama2|08456" atau "Nama1,Nama2"
       const patientsArray = patients.split(',').map((p) => p.trim())
       patientList = patientsArray.map((patient) => {
-        const [name, phone] = patient.split('|').map((s) => s.trim())
+        const [name, phone] = patient.split('++').map((s) => s.trim())
         return {
           name,
           phone: phone || '-',
