@@ -1,4 +1,3 @@
-// lib/actions/booking.ts
 'use server'
 
 import { prisma, handlePrismaError } from '@/lib/prisma'
@@ -273,6 +272,36 @@ export async function deleteBooking(id: number): Promise<ActionResponse> {
     return {
       success: true,
       message: 'Booking berhasil dihapus',
+    }
+  } catch (error) {
+    const errorResponse = handlePrismaError(error)
+    return {
+      success: false,
+      error: errorResponse.error,
+      details: errorResponse.details,
+    }
+  }
+}
+
+// DELETE MULTIPLE - Hapus multiple bookings
+export async function deleteMultipleBookings(ids: number[]): Promise<ActionResponse> {
+  try {
+    const result = await prisma.booking.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    })
+
+    // Revalidate cache
+    revalidatePath('/')
+    revalidatePath('/dashboard')
+
+    return {
+      success: true,
+      message: `${result.count} booking berhasil dihapus`,
+      count: result.count,
     }
   } catch (error) {
     const errorResponse = handlePrismaError(error)

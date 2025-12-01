@@ -7,7 +7,7 @@ import Modal from '@/components/ui/Modal'
 import RescheduleForm from '@/components/RescheduleExamForm'
 import BookingRowEdit from '@/components/BookingExamRowEdit'
 import UpdateStatusForm from '@/components/BookingExamUpdateStatusForm'
-
+import DeleteConfirmForm from '@/components/BookingExamRowDelete'
 type BookingTableProps = {
   bookings: BookingWithUser[]
 }
@@ -15,9 +15,11 @@ type BookingTableProps = {
 export default function BookingTable({ bookings }: BookingTableProps) {
   const [isRescheduleMode, setIsRescheduleMode] = useState(false)
   const [isUpdateStatusMode, setIsUpdateStatusMode] = useState(false)
+  const [isDeleteMode, setIsDeleteMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<number[]>([])
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false)
   const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
 
   // Toggle select all
@@ -47,6 +49,12 @@ export default function BookingTable({ bookings }: BookingTableProps) {
   // Cancel update status mode
   const handleCancelUpdateStatus = () => {
     setIsUpdateStatusMode(false)
+    setSelectedIds([])
+  }
+
+  // Cancel delete mode
+  const handleCancelDelete = () => {
+    setIsDeleteMode(false)
     setSelectedIds([])
   }
 
@@ -82,6 +90,22 @@ export default function BookingTable({ bookings }: BookingTableProps) {
     setSelectedIds([])
   }
 
+  // Open delete modal
+  const handleOpenDeleteModal = () => {
+    if (selectedIds.length === 0) {
+      alert('Pilih minimal 1 booking untuk dihapus')
+      return
+    }
+    setIsDeleteModalOpen(true)
+  }
+
+  // After delete success
+  const handleDeleteSuccess = () => {
+    setIsDeleteModalOpen(false)
+    setIsDeleteMode(false)
+    setSelectedIds([])
+  }
+
   // Handle edit mode
   const handleEditClick = (id: number) => {
     setEditingId(id)
@@ -103,7 +127,7 @@ export default function BookingTable({ bookings }: BookingTableProps) {
 
           {/* Bulk Action Buttons */}
           <div className="flex gap-2">
-            {!isRescheduleMode && !isUpdateStatusMode ? (
+            {!isRescheduleMode && !isUpdateStatusMode && !isDeleteMode ? (
               <>
                 <button
                   onClick={() => setIsRescheduleMode(true)}
@@ -122,6 +146,15 @@ export default function BookingTable({ bookings }: BookingTableProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Update Status
+                </button>
+                <button
+                  onClick={() => setIsDeleteMode(true)}
+                  className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors font-medium flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Hapus Booking
                 </button>
               </>
             ) : isRescheduleMode ? (
@@ -143,7 +176,7 @@ export default function BookingTable({ bookings }: BookingTableProps) {
                   Batal
                 </button>
               </>
-            ) : (
+            ) : isUpdateStatusMode ? (
               <>
                 <button
                   onClick={handleOpenUpdateStatusModal}
@@ -157,6 +190,25 @@ export default function BookingTable({ bookings }: BookingTableProps) {
                 </button>
                 <button
                   onClick={handleCancelUpdateStatus}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors font-medium"
+                >
+                  Batal
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleOpenDeleteModal}
+                  disabled={selectedIds.length === 0}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Hapus ({selectedIds.length})
+                </button>
+                <button
+                  onClick={handleCancelDelete}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors font-medium"
                 >
                   Batal
@@ -178,11 +230,11 @@ export default function BookingTable({ bookings }: BookingTableProps) {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  {(isRescheduleMode || isUpdateStatusMode) && (
+                  {(isRescheduleMode || isUpdateStatusMode || isDeleteMode) && (
                     <th className="px-6 py-3 text-left">
                       <input
                         type="checkbox"
-                        checked={selectedIds.length === bookings.length}
+                        checked={selectedIds.length === bookings.length && bookings.length > 0}
                         onChange={(e) => handleSelectAll(e.target.checked)}
                         className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                       />
@@ -206,7 +258,7 @@ export default function BookingTable({ bookings }: BookingTableProps) {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Keterangan
                   </th>
-                  {!isRescheduleMode && !isUpdateStatusMode && (
+                  {!isRescheduleMode && !isUpdateStatusMode && !isDeleteMode && (
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Aksi
                     </th>
@@ -219,9 +271,11 @@ export default function BookingTable({ bookings }: BookingTableProps) {
                     key={booking.id} 
                     className={`hover:bg-gray-50 ${
                       selectedIds.includes(booking.id) ? 'bg-blue-50' : ''
-                    } ${editingId === booking.id ? 'bg-yellow-50' : ''}`}
+                    } ${editingId === booking.id ? 'bg-yellow-50' : ''} ${
+                      isDeleteMode && selectedIds.includes(booking.id) ? 'bg-red-50' : ''
+                    }`}
                   >
-                    {(isRescheduleMode || isUpdateStatusMode) && (
+                    {(isRescheduleMode || isUpdateStatusMode || isDeleteMode) && (
                       <td className="px-6 py-4">
                         <input
                           type="checkbox"
@@ -279,7 +333,7 @@ export default function BookingTable({ bookings }: BookingTableProps) {
                         <td className="px-6 py-4 text-sm text-gray-500">
                           {booking.notes || '-'}
                         </td>
-                        {!isRescheduleMode && !isUpdateStatusMode && (
+                        {!isRescheduleMode && !isUpdateStatusMode && !isDeleteMode && (
                           <td className="px-6 py-4 whitespace-nowrap">
                             <button
                               onClick={() => handleEditClick(booking.id)}
@@ -329,6 +383,21 @@ export default function BookingTable({ bookings }: BookingTableProps) {
           bookings={selectedBookings}
           onSuccess={handleUpdateStatusSuccess}
           onCancel={() => setIsUpdateStatusModalOpen(false)}
+        />
+      </Modal>
+
+      {/* Delete Modal */}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title={`Hapus ${selectedIds.length} Booking`}
+        size="md"
+      >
+        <DeleteConfirmForm
+          bookingIds={selectedIds}
+          bookings={selectedBookings}
+          onSuccess={handleDeleteSuccess}
+          onCancel={() => setIsDeleteModalOpen(false)}
         />
       </Modal>
     </>
