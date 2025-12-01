@@ -22,7 +22,7 @@ export default function RescheduleForm({ bookingIds, bookings, onSuccess, onCanc
     timeSlot: '',
   })
 
-  const timeSlots = generateTimeSlots(8, 16, 20)
+  const timeSlots = generateTimeSlots()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

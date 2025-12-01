@@ -24,7 +24,7 @@ export default function BookingRowEdit({ booking, onCancel }: BookingRowEditProp
     notes: booking.notes || '',
   })
 
-  const timeSlots = generateTimeSlots(8, 16, 20)
+  const timeSlots = generateTimeSlots()
 
   const handleSave = async () => {
     setIsLoading(true)

@@ -13,7 +13,7 @@ export type TimeSlot = {
   export function generateTimeSlots(
     startHour: number = 8,
     endHour: number = 16,
-    intervalMinutes: number = 20
+    intervalMinutes: number = 10
   ): TimeSlot[] {
     const slots: TimeSlot[] = []
   

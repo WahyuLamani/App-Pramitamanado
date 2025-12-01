@@ -23,7 +23,7 @@ export default function BookingForm({ onSuccess, onCancel }: BookingFormProps) {
     notes: '',
   })
 
-  const timeSlots = generateTimeSlots(8, 16, 20) // 08:00 - 16:00, interval 20 menit
+  const timeSlots = generateTimeSlots()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
