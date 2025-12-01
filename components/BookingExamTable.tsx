@@ -222,7 +222,7 @@ export default function BookingTable({ bookings }: BookingTableProps) {
           <div className="px-6 py-12 text-center">
             <p className="text-gray-500">Belum ada data booking</p>
             <p className="text-sm text-gray-400 mt-1">
-              Klik tombol "Tambah Booking" untuk membuat booking baru
+              Klik tombol &quot;Tambah Booking&quot; untuk membuat booking baru
             </p>
           </div>
         ) : (

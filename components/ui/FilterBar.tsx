@@ -150,7 +150,7 @@ export default function FilterBar() {
             <span className="text-sm text-gray-600">Filter aktif:</span>
             {search && (
               <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full flex items-center gap-1">
-                Nama: "{search}"
+                Nama: &quot;{search}&quot;
                 <button
                   onClick={() => setSearch('')}
                   className="hover:text-blue-900"
