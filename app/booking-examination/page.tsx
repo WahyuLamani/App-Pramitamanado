@@ -1,17 +1,26 @@
 import { getBookings } from '@/lib/booking-examination/action'
 import DateFilter from '@/components/features/DateFilter'
-
 import AddBookingButton from '@/components/ui/AddBookingButton'
-
 import BookingTable from '@/components/BookingExamTable'
+import FilterBar from '@/components/ui/FilterBar'
 
 type PageProps = {
-  searchParams: { date?: string }
+  searchParams: { 
+    date?: string
+    search?: string
+    examination?: string
+    status?: string
+  }
 }
 
 export default async function DashboardPage({ searchParams }: PageProps) {
-  // Fetch data di server component dengan filter tanggal
-  const result = await getBookings(searchParams.date)
+  // Fetch data di server component dengan filter
+  const result = await getBookings(
+    searchParams.date,
+    searchParams.search,
+    searchParams.examination,
+    searchParams.status
+  )
 
   if (!result.success) {
     return (
@@ -41,6 +50,9 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
         {/* Date Filter */}
         <DateFilter />
+
+        {/* Advanced Filter & Search */}
+        <FilterBar />
 
         {/* Stats Card */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

@@ -42,16 +42,40 @@ export type BookingUpdateInput = {
 }
 
 // GET - Ambil semua bookings
-export async function getBookings(date?: string): Promise<ActionResponse<BookingWithUser[]>> {
+export async function getBookings(
+  date?: string,
+  search?: string,
+  examination?: string,
+  status?: string
+): Promise<ActionResponse<BookingWithUser[]>> {
   try {
-    const where = date
-      ? {
-          bookingDate: {
-            gte: new Date(date + 'T00:00:00'),
-            lt: new Date(date + 'T23:59:59'),
-          },
-        }
-      : {}
+    const where: any = {}
+
+    // Filter by date
+    if (date) {
+      where.bookingDate = {
+        gte: new Date(date + 'T00:00:00'),
+        lt: new Date(date + 'T23:59:59'),
+      }
+    }
+
+    // Search by patient name
+    if (search) {
+      where.patientName = {
+        contains: search,
+        mode: 'insensitive',
+      }
+    }
+
+    // Filter by examination type
+    if (examination) {
+      where.examination = examination
+    }
+
+    // Filter by status
+    if (status) {
+      where.status = status
+    }
 
     const bookings = await prisma.booking.findMany({
       where,
