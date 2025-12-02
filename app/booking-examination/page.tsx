@@ -3,6 +3,7 @@ import DateFilter from '@/components/features/DateFilter'
 import AddBookingButton from '@/components/ui/AddBookingButton'
 import BookingTable from '@/components/BookingExamTable'
 import FilterBar from '@/components/ui/FilterBar'
+import CurrentUser from '@/components/ui/CurrentUser'
 
 type PageProps = {
   searchParams: { 
@@ -39,13 +40,18 @@ export default async function DashboardPage({ searchParams }: PageProps) {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Dashboard Booking Pemeriksaan
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Kelola booking pemeriksaan USG dan Treadmill
-          </p>
+        <div className="mb-8 flex justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Dashboard Booking Pemeriksaan
+            </h1>
+            <p className="text-gray-600 mt-2">
+              Kelola booking pemeriksaan USG dan Treadmill
+            </p>
+          </div>
+          <div>
+            <CurrentUser/>
+          </div>
         </div>
 
         {/* Date Filter */}
