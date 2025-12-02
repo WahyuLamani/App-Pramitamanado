@@ -29,7 +29,6 @@ export default function LoginForm() {
         const searchParams = new URLSearchParams(window.location.search)
         const redirect = searchParams.get('redirect') || '/'
         router.push(redirect)
-        router.refresh()
       } else {
         setError(result.error || 'Login gagal')
       }
