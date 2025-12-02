@@ -25,8 +25,10 @@ export default function LoginForm() {
         // Save to cookies (server-side)
         await setAuthCookie(result.user)
         
-        // Redirect to dashboard
-        router.push('/')
+        // Redirect to needed url
+        const searchParams = new URLSearchParams(window.location.search)
+        const redirect = searchParams.get('redirect') || '/'
+        router.push(redirect)
         router.refresh()
       } else {
         setError(result.error || 'Login gagal')
@@ -71,7 +73,7 @@ export default function LoginForm() {
             name="username"
             value={formData.username}
             onChange={handleChange}
-            placeholder="Masukkan username"
+            placeholder="PXXXX"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
             required
             disabled={isLoading}
