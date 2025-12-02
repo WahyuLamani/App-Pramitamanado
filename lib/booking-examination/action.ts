@@ -3,6 +3,7 @@
 import { prisma, handlePrismaError } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { Booking, User } from '@prisma/client'
+import { getAuthUser } from '@/lib/authentication/prismaAuth'
 
 // Type definitions
 export type BookingWithUser = Booking & {
@@ -155,6 +156,14 @@ export async function createBooking(input: BookingInput): Promise<ActionResponse
         details: 'patients, examination, bookingDate, dan timeSlot wajib diisi',
       }
     }
+    const authUser = await getAuthUser()
+    if (!authUser) {
+      return {
+        success: false,
+        error: 'Unauthorized',
+        details: 'Anda harus login terlebih dahulu',
+      }
+    }
 
     // Parse patients (bisa array atau string dengan koma)
     let patientList: Array<{ name: string; phone: string }> = []
@@ -184,9 +193,6 @@ export async function createBooking(input: BookingInput): Promise<ActionResponse
       }
     }
 
-    // TODO: Nanti ganti userId dengan data dari session/auth
-    const DEFAULT_USER_ID = 1 // Admin default
-
     const bookingsData = patientList.map((patient) => ({
       patientName: patient.name,
       patientPhone: patient.phone,
@@ -195,7 +201,7 @@ export async function createBooking(input: BookingInput): Promise<ActionResponse
       timeSlot,
       status: status || 'Belum Registrasi',
       notes: notes || null,
-      userId: DEFAULT_USER_ID,
+      userId: authUser.id,
     }))
 
     const createdBookings = await prisma.booking.createMany({
