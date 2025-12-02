@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { loginUser, setAuthCookie } from '@/lib/authentication/prismaAuth'
 
 export default function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect') || '/'
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState({
@@ -26,9 +28,9 @@ export default function LoginForm() {
         await setAuthCookie(result.user)
         
         // Redirect to needed url
-        const searchParams = new URLSearchParams(window.location.search)
-        const redirect = searchParams.get('redirect') || '/'
-        router.push(redirect)
+        // const searchParams = new URLSearchParams(window.location.search)
+        // const redirect = searchParams.get('redirect') || '/'
+        router.push(redirectTo)
       } else {
         setError(result.error || 'Login gagal')
       }

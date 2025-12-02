@@ -1,15 +1,7 @@
-import { redirect } from 'next/navigation'
-import { getAuthUser } from '@/lib/authentication/prismaAuth'
 import LoginForm from '@/components/ui/LoginForm'
 import { UserRound } from 'lucide-react'
+import { Suspense } from 'react'
 export default async function LoginPage() {
-  // Check if already logged in
-  const user = await getAuthUser()
-  
-  if (user) {
-    redirect('/')
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-rose-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -25,7 +17,9 @@ export default async function LoginPage() {
           </div>
 
           {/* Login Form Component (Client) */}
-          <LoginForm />
+          <Suspense fallback={<div className="text-center">Loading...</div>}>
+            <LoginForm />
+          </Suspense>
 
           {/* Default Credentials Info */}
           <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
