@@ -20,15 +20,6 @@ export default async function LoginPage() {
           <Suspense fallback={<div className="text-center">Loading...</div>}>
             <LoginForm />
           </Suspense>
-
-          {/* Default Credentials Info */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div className="text-xs font-semibold text-gray-700 mb-2">Default Login (Development):</div>
-            <div className="space-y-1 text-xs text-gray-600">
-              <div>• Username: <code className="bg-gray-200 px-2 py-0.5 rounded">admin</code></div>
-              <div>• Password: <code className="bg-gray-200 px-2 py-0.5 rounded">admin123</code></div>
-            </div>
-          </div>
         </div>
 
         {/* Footer */}
