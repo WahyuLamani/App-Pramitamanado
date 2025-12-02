@@ -33,9 +33,11 @@ export default function LoginForm() {
         router.push(redirectTo)
       } else {
         setError(result.error || 'Login gagal')
+        setIsLoading(false)
       }
     } catch (err) {
       setError('Terjadi kesalahan yang tidak terduga')
+      setIsLoading(false)
       console.error(err)
     }
   }
