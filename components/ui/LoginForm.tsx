@@ -37,8 +37,6 @@ export default function LoginForm() {
     } catch (err) {
       setError('Terjadi kesalahan yang tidak terduga')
       console.error(err)
-    } finally {
-      setIsLoading(false)
     }
   }
 
