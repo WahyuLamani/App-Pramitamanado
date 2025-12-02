@@ -4,6 +4,8 @@ import AddBookingButton from '@/components/ui/AddBookingButton'
 import BookingTable from '@/components/BookingExamTable'
 import FilterBar from '@/components/ui/FilterBar'
 import CurrentUser from '@/components/ui/CurrentUser'
+import { Suspense } from 'react'
+import BookingTableSkeleton from '@/components/Skeleton/BookingExamTable'
 
 type PageProps = {
   searchParams: { 
@@ -85,7 +87,9 @@ export default async function DashboardPage({ searchParams }: PageProps) {
         </div>
 
         {/* Booking List */}
-        <BookingTable bookings={bookings} />
+        <Suspense fallback={<BookingTableSkeleton/>}>
+          <BookingTable bookings={bookings} />
+        </Suspense>
 
         {/* Action Button */}
         <div className="mt-6 flex justify-end">
